@@ -1,9 +1,19 @@
+/* 
+    Customer.c
+    Customer functions.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "Customer.h"
 #include "RandNorm.h"
 
+/* 
+    Returns string representation of a Customer instance.
+    @param c: Pointer to a Customer instance.
+    @returns string representation of [c].
+*/
 char* customerToString(Customer* c) {
 
     char* buff;
@@ -36,6 +46,15 @@ char* customerToString(Customer* c) {
     return buff;
 }
 
+/* 
+    Create customer dynamically (essentially a constructor function, without a class) 
+    @param id: the Customer's identifer
+    @param st_mean: Mean service time
+    @param st_sd: Variance in service time
+    @param wt_mean: Mean waiting tolerance
+    @param wt_sd: Variance in waiting tolerance
+    @returns A pointer to a Customer instance.
+*/
 Customer* createCustomer(
     unsigned int id,
     double st_mean,

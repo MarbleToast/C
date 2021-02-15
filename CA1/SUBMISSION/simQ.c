@@ -1,4 +1,5 @@
-/* simQ.c
+/* 
+    simQ.c
     Program entry point.
 */
 
@@ -12,6 +13,8 @@
 #include "CustomerParser.h"
 
 int main(int argc, char* argv[]) {
+
+    /* Declarations of variables, as per ANSI standard */
 
     FILE* inputFile;
     FILE* outputFile;
@@ -132,6 +135,7 @@ int main(int argc, char* argv[]) {
     /* Seed RNG */
     srand((unsigned int)time(NULL));
 
+    /* Form empty queues */
     serviceQueue = newQueue(MAX_QUEUE_LENGTH);
     servicePoints = newQueue(NUM_SERVICE_POINTS);
 
@@ -139,6 +143,7 @@ int main(int argc, char* argv[]) {
     
     for (simNum = 0; simNum < NUM_SIMULATIONS;) {
 
+        /* Generate random uniform distributed number for customer quantity */
         customerQuantity = 0;
         while (customerQuantity == 0) {
             customerQuantity = randNorm(NUM_CUSTOMERS_MEAN, NUM_CUSTOMERS_SD);
@@ -147,8 +152,10 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        /* Generate array of integers that sum to customerQuantity */
         customersAdditionSteps = randNumsToSum(customerQuantity, CLOSING_TIME);
 
+        /* Form empty queues */
         timedOutCustomers = newQueue(customerQuantity);
         unfufilledCustomers = newQueue(customerQuantity);
         fufilledCustomers = newQueue(customerQuantity);
@@ -156,7 +163,10 @@ int main(int argc, char* argv[]) {
         timeStep = 0;
         customerID = 0;
 
-        while (serviceQueue->size > 0 || servicePoints->size > 0 || timeStep == 0 || timeStep < CLOSING_TIME) {
+        /* Whilst customers are still in the system, or time steps hasn't passed the closing time, run */
+        while (serviceQueue->size > 0 || servicePoints->size > 0 || timeStep < CLOSING_TIME) {
+
+            /* as per spec, if a single sim iteration, print to output at each step*/
             if (NUM_SIMULATIONS == 1) {
                 fprintf(outputFile,
                     "Time step %u: %u being served, %u waiting, %u fufilled, %u timed out, %u unfufilled\n",
@@ -169,6 +179,7 @@ int main(int argc, char* argv[]) {
                 );
             }
 
+            /* Work though service points queue, check to see if they have finished */
             working = servicePoints->head;
             while (working != NULL) {
                 working->customer->serviceTime--;
@@ -181,14 +192,16 @@ int main(int argc, char* argv[]) {
                 }
             }
 
+            /* Pop head of queue into tail of service points queue, for however many spaces there are */
             serviceSpace = servicePoints->size;
             for (i = 0; i < (servicePoints->maxSize - serviceSpace);) {
                 if (serviceQueue->head != NULL) {
-                    enqueue(servicePoints, splice(serviceQueue, serviceQueue->head->key));
+                    enqueue(servicePoints, dequeue(serviceQueue));
                 }
                 ++i;
             }
 
+            /* Work though main queue, check to see if they have ran out of patience */
             waiting = serviceQueue->head;
             while (waiting != NULL) {
                 waiting->customer->waitingTime++;
@@ -201,6 +214,10 @@ int main(int argc, char* argv[]) {
                 }
             }
 
+            /* 
+                If we haven't reached closing time, add customers equal to the integer at index
+                timeStep in our addition steps
+            */
             if (timeStep < CLOSING_TIME) {
                 for (i = 0; i < customersAdditionSteps[timeStep];) {
                     C = createCustomer(
@@ -210,6 +227,7 @@ int main(int argc, char* argv[]) {
                         CUSTOMER_TOLERANCE_MEAN,
                         CUSTOMER_TOLERANCE_SD
                     );
+                    /* If can't be added to main queue, add them to unfufilled queue (or error handle) */
                     if (!enqueue(serviceQueue, C)) {
                         if (!enqueue(unfufilledCustomers, C)) {
 			                fprintf(stderr, "[ERROR] : Customer could not be added to unfufilled queue.");
@@ -223,6 +241,7 @@ int main(int argc, char* argv[]) {
             timeStep++;
         }
 
+        /* Tally up metrics for this simulation pass, free any reused pointers before they drop out of scope */
         totalFufilled += fufilledCustomers->size;
         totalUnfufilled += unfufilledCustomers->size;
         totalTimedOut += timedOutCustomers->size;
@@ -246,6 +265,7 @@ int main(int argc, char* argv[]) {
 
     totalCustomers = totalUnfufilled + totalFufilled + totalTimedOut;
 
+    /* Print to file, close file, free outer scope pointers */
     if (NUM_SIMULATIONS > 1) {
         fprintf(outputFile, "\nNo. of total customers over %u simulations: %u\n", NUM_SIMULATIONS, totalCustomers);
         fprintf(outputFile, "Average no. of unfufilled customers: %.2f\n", (float) totalUnfufilled / NUM_SIMULATIONS);

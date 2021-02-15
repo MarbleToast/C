@@ -1,7 +1,7 @@
 #ifndef CUSTOMER_H
 #define CUSTOMER_H
 
-typedef struct {
+typedef struct customer {
     unsigned int id;
     unsigned int serviceTime;
     unsigned short waitingTolerance;

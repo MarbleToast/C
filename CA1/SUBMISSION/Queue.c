@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+    Creates an empty Queue with a defined max length.
+    @param max: Maximum length of the queue.
+    @returns Pointer to a Queue instance, where q->maxSize = [max]
+*/
 Queue* newQueue(unsigned int max) {
     Queue* q = NULL;
 
@@ -19,6 +24,12 @@ Queue* newQueue(unsigned int max) {
     return q;
 }
 
+/*
+    Creates a new QueueNode, then appends it to Queue q.
+    @param q: Pointer to a Queue instance
+    @param c: Pointer to a Customer instance
+    @returns 0 if queue full, 1 if added successfully.
+*/
 int enqueue(Queue* q, Customer* c) {
 
     QueueNode* node;
@@ -51,16 +62,23 @@ int enqueue(Queue* q, Customer* c) {
     return 1;
 }
 
+/*
+    Gets the Customer in the head node and frees the head node.
+    @param q: Pointer to a Queue instance
+    @returns Pointer to a Customer instance. 
+*/
 Customer* dequeue(Queue* q) {
 
     Customer* c;
+    QueueNode* prevHead;
 
     if (q->head == NULL || q->size == 0) return NULL;
 
-    c = q->head->customer;
-    free(&q->head);
+    prevHead = q->head;
+    c = prevHead->customer;
 
     q->head = q->head->next;
+    free(prevHead);
 
     if (q->head == NULL) {
         q->tail = NULL;
@@ -74,6 +92,12 @@ Customer* dequeue(Queue* q) {
     return c;
 }
 
+/*
+    Gets the Customer in the node at the given key and frees the node.
+    @param q: Pointer to a Queue instance
+    @param key: the integer key for the node
+    @returns Pointer to a Customer instance. 
+*/
 Customer* splice(Queue* q, unsigned int key) {
     Customer* customer;
     QueueNode* node = q->head;
@@ -83,6 +107,7 @@ Customer* splice(Queue* q, unsigned int key) {
         if (node->key == key) {
 
             if (q->size > 1) {
+                /* Account for head or tail node placement */
                 if (node->next != NULL) {
                     node->next->previous = node->previous;
                 }
@@ -110,6 +135,10 @@ Customer* splice(Queue* q, unsigned int key) {
     return NULL;
 }
 
+/*
+    Frees all remaining nodes in a Queue, effectively emptying it.
+    @param q: Pointer to a Queue instance.
+*/
 void freeQueue(Queue* q) {
 
     QueueNode* temp;

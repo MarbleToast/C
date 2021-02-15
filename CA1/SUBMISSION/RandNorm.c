@@ -3,8 +3,15 @@
 #include <math.h>
 #include <stdlib.h>
 
+/*
+    Generates a random, normallly distributed integer.
+    @param mean: Mean of normal distribution
+    @param sd: Variance of normal distribution
+    @returns A random normallly distributed integer 
+*/
 int randNorm(double mean, double sd) {
 
+    /* Utilises Box-Muller transform method */
     double norm;
     double r;
     double t = 0.0;
@@ -26,6 +33,12 @@ int randNorm(double mean, double sd) {
     return (norm * sd) + mean;
 }
 
+/*
+    Naively generates an integer array of size [steps], where the sum of all elements equals a predefined target.
+    @param target: Sum of array
+    @param steps: Size of array
+    @returns An integer array of size [steps]
+*/
 unsigned int* randNumsToSum(unsigned int target, unsigned int steps) {
 
     float* numbers;
@@ -45,10 +58,12 @@ unsigned int* randNumsToSum(unsigned int target, unsigned int steps) {
         exit(EXIT_FAILURE);
     }
 
+    /* Naive loop to eventually generate exact target- rarely fails, so non-intensive */
     while (sum_uint != target) {
         sum_uint = 0;
         sum_float = 0;
 
+        /* Create [steps] floats between 0 and 1 */
         for (i = 0; i < steps;) {
             rand_num = (float)rand() / (float)RAND_MAX;
             numbers[i] = rand_num;
@@ -56,6 +71,7 @@ unsigned int* randNumsToSum(unsigned int target, unsigned int steps) {
             ++i;
         }
 	
+        /* Average and round floats to nearest integer */
         for (i = 0; i < steps;) {
             numbers[i] /= sum_float;
             numbers[i] *= target;
