@@ -58,7 +58,7 @@ unsigned int* randNumsToSum(unsigned int target, unsigned int steps) {
         exit(EXIT_FAILURE);
     }
 
-    /* Naive loop to eventually generate exact target- rarely fails, so non-intensive */
+    /* Naive loop to eventually generate exact target */
     while (sum_uint != target) {
         sum_uint = 0;
         sum_float = 0;

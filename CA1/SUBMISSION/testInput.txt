@@ -1,10 +1,10 @@
 maxQueueLength = 15
-numServicePoints = 10
-closingTime = 100
+numServicePoints = 3
+closingTime = 510
 
-numCustomersMean = 150
+numCustomersMean = 516
 numCustomersSD = 1
-customerServiceTimeMean = 1
-customerServiceTimeSD = 5
-customerToleranceMean = 50
-customerToleranceSD = 10
+customerServiceTimeMean = 2
+customerServiceTimeSD = 1
+customerToleranceMean = 4
+customerToleranceSD = 2
